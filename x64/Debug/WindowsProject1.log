@@ -1,0 +1,4 @@
+﻿  WindowsProject1.cpp
+C:\Users\Merry\source\repos\LiveWallpaper\WindowsProject1\NotifyIcon.h(41,35): warning C4309: '引數': 轉換導致常數值遭截斷; 可能需要使用較大的類型
+C:\Users\Merry\source\repos\LiveWallpaper\WindowsProject1\Wallpaper.h(19): warning C4715: 'EnumWindowsProc': 不是所有控制路徑都傳回值
+  WindowsProject1.vcxproj -> C:\Users\Merry\source\repos\LiveWallpaper\x64\Debug\WindowsProject1.exe
