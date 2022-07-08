@@ -20,7 +20,7 @@ HWND hWnd_EXIT = NULL;
 HWND hWnd_HIDE = NULL;
 HWND hWnd_PATHTEXTBOX = NULL;
 
-libvlc_media_list_player_t* mediaListPlayer;
+libvlc_media_list_player_t* mediaListPlayer = NULL;
 
 ATOM MyRegisterClass(HINSTANCE hInstance);
 BOOL InitInstance(HINSTANCE, int);
@@ -42,7 +42,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
 	MSG msg;
 
-	// 主訊息迴圈:
 	while (GetMessage(&msg, nullptr, 0, 0))
 	{
 		TranslateMessage(&msg);
@@ -126,7 +125,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	UINT WM_TASKBARCREATED;
 
 	if (hWnd == NULL) return 0;
-	WM_TASKBARCREATED = RegisterWindowMessage(TEXT("TaskbarCreated"));;
+	WM_TASKBARCREATED = RegisterWindowMessage(TEXT("TaskbarCreated"));
 
 	switch (message)
 	{
@@ -229,8 +228,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		nid.uTimeout = 1000;
 		nid.uVersion = NOTIFYICON_VERSION_4;
 		lstrcpy(nid.szTip, szWindowClass);
-		//lstrcpy(nid.szInfo, L"縮小至系統托盤");
-		//lstrcpy(nid.szInfoTitle, L"動態桌布");
 		nid.dwInfoFlags = NIIF_USER;
 		Shell_NotifyIcon(NIM_SETVERSION, &nid);
 		Shell_NotifyIcon(NIM_ADD, &nid);
@@ -250,7 +247,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			OPENFILENAME ofn = { 0 };
 			ofn.lStructSize = sizeof(OPENFILENAME);
 			ofn.hwndOwner = hWnd;
-			ofn.lpstrFilter = TEXT("*.mp4\0*.mp4\0*.avi\0*.avi\0*.gif\0*.gif\0\0");
+			ofn.lpstrFilter = TEXT("*.mp4\0*.mp4\0*.avi\0*.avi\0\0");
 			ofn.nFilterIndex = 1;
 			ofn.lpstrFile = strFileName;
 			ofn.nMaxFile = sizeof(strFileName);
@@ -271,39 +268,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 		case USR_PLAY:
 		{
-			/* opencv 解法，cpu占用率太高，放棄
-			PLAYER_STATE = PLAYER_PLAY;
-
-			cv::namedWindow(WINDOW_NAME, cv::WINDOW_NORMAL);
-			cv::moveWindow(WINDOW_NAME, 0, 0);
-			cv::setWindowProperty(WINDOW_NAME, cv::WND_PROP_FULLSCREEN, cv::WINDOW_FULLSCREEN);
-			cv::resizeWindow(WINDOW_NAME, cv::Size(1366, 768));
-
-			hWnd_Wallpaper = FindWindow(NULL, std::wstring(WINDOW_NAME.begin(), WINDOW_NAME.end()).c_str());
-			SetParent(hWnd_Wallpaper, workerw);
-
-			cv::VideoCapture capture;
-			capture.open(filePath);
-
-			int frameDuaration = (int)((1.0f / capture.get(cv::CAP_PROP_FPS)) * 1000.0f);
-			cv::Mat frame;
-
-			while (true) {
-				if (!capture.read(frame)) {
-					capture.set(cv::CAP_PROP_POS_FRAMES, 0); // repeat
-					continue;
-				}
-
-				cv::imshow(WINDOW_NAME, frame);
-				cv::waitKey(frameDuaration);
-				if (PLAYER_STATE == PLAYER_STOP) {
-					capture.release();
-					cv::destroyAllWindows();
-					break;
-				}
+			if (mediaListPlayer != NULL && libvlc_media_list_player_is_playing(mediaListPlayer)) {
+				libvlc_media_list_player_stop(mediaListPlayer);
 			}
-			*/
-
+			
 			libvlc_instance_t* libvlcInst = libvlc_new(0, NULL);
 			if (libvlcInst == NULL) {
 				MessageBox(hWnd, L"Cannot Create Libvlc instance", L"Error", MB_ICONERROR);
@@ -323,7 +291,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			libvlc_media_list_player_set_playback_mode(mediaListPlayer, libvlc_playback_mode_loop);
 			libvlc_media_player_set_hwnd(mediaPlayer, workerw);
 			libvlc_media_list_player_play(mediaListPlayer);
-			
 			break;
 		}
 

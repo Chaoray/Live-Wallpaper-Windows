@@ -5,12 +5,10 @@
 #define PLAYER_IDLE 0
 
 HWND hWnd_Wallpaper = NULL;
+HWND workerw = NULL;
 std::string WINDOW_NAME = "wallpaper";
 int ScreenWidth = GetSystemMetrics(SM_CXSCREEN);
 int ScreenHeight = GetSystemMetrics(SM_CYSCREEN);
-int PLAYER_STATE = PLAYER_IDLE;
-
-HWND workerw = NULL;
 
 BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam) {
 	HWND p = FindWindowEx(hwnd, NULL, L"SHELLDLL_DefView", NULL);
@@ -21,7 +19,7 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam) {
 void GetWallpaperHwnd() {
 	HWND hProgman = FindWindowA("Progman", "Program Manager");
 	if (!hProgman) MessageBox(NULL, L"§ä¤£¨ìProgmanµøµ¡", L"¿ù»~", MB_OK);
-	SendMessageA(hProgman, (UINT)1324, 0, 0);
+	SendMessage(hProgman, (UINT)(WM_USER + 300), 0, 0);
 
 	EnumWindows(EnumWindowsProc, (LPARAM)NULL);
 
